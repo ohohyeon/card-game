@@ -32,7 +32,7 @@ function cardColor(suit) {
 
 export default function GamePage() {
   const params = useParams();
-  const code = params?.code;
+  const code = Array.isArray(params?.code) ? params.code[0] : params?.code;
   const searchParams = useSearchParams();
   const gameType = searchParams.get("type");
   const [room, setRoom] = useState(null);
@@ -49,7 +49,8 @@ export default function GamePage() {
     setPlayerName(name);
     setIsHost(host);
 
-    const unsub = onSnapshot(doc(db, "rooms", code), (snap) => {
+    if (!code) return; // 👈 이 줄을 바로 위에 추가해 주세요!
+      const unsub = onSnapshot(doc(db, "rooms", code), (snap) => {
       if (snap.exists()) {
         const data = snap.data();
         setRoom(data);
@@ -68,6 +69,7 @@ export default function GamePage() {
   }, [isHost, room, gameState, initialized]);
 
   async function initGame() {
+  if (!code) return; // 👈 이 줄을 바로 아래에 추가해 주세요!
     console.log("initGame 실행됨");
     const snap = await getDoc(doc(db, "rooms", code));
     const data = snap.data();
