@@ -6,7 +6,7 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
 export default function RoomPage() {
   const params = useParams();
-  const code = params?.code;
+  const code = Array.isArray(params?.code) ? params.code[0] : params?.code; // ⭕ 글자 타입 안전장치
   const router = useRouter();
   const [room, setRoom] = useState(null);
   const [playerName, setPlayerName] = useState("");
@@ -22,8 +22,9 @@ export default function RoomPage() {
     
     setPlayerName(nameFromUrl);
     setIsHost(hostFromUrl);
-    
-    const unsub = onSnapshot(doc(db, "rooms", code), (snap) => {
+
+    if (typeof code !== "string") return; // ⭕ code가 확실한 '글자'일 때만 통과시키는 방어막!
+      const unsub = onSnapshot(doc(db, "rooms", code), (snap) => {
       if (snap.exists()) {
         const data = snap.data();
         setRoom(data);
@@ -35,8 +36,9 @@ export default function RoomPage() {
     return () => unsub();
   }, [code]);
   
-async function startGame(gameType) {
-    await updateDoc(doc(db, "rooms", code), {
+  async function startGame(gameType) {
+  if (typeof code !== "string") return; // ⭕ 여기도 확실하게 글자 타입만 검사하도록 변경!
+  await updateDoc(doc(db, "rooms", code), {
       status: "playing",
       gameType,
     });
@@ -55,7 +57,7 @@ async function startGame(gameType) {
       background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
       display: "flex",
       alignItems: "center",
-      justifyContent: "center",
+      justify: "center",
       fontFamily: "'Segoe UI', sans-serif",
       padding: "20px",
       color: "white",
