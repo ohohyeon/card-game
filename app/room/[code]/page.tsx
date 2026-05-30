@@ -1,48 +1,52 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react"; // ⭕ Suspense 추가
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { db } from "../../lib/firebase";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
-export default function RoomPage() {
+// ==========================================
+// 1. 실시간 방 데이터 및 게임 선택 컴포넌트
+// ==========================================
+function RoomContent() {
   const params = useParams();
-  const code = Array.isArray(params?.code) ? params.code[0] : params?.code; // ⭕ 글자 타입 안전장치
+  const code = Array.isArray(params?.code) ? params.code[0] : params?.code;
   const router = useRouter();
-  const [room, setRoom] = useState(null);
+  const searchParams = useSearchParams();
+
+  const [room, setRoom] = useState<any>(null);
   const [playerName, setPlayerName] = useState("");
   const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
     if (!code) return;
     
-    // URL에서 파라미터 읽기
-    const urlParams = new URLSearchParams(window.location.search);
-    const nameFromUrl = urlParams.get("name") || "";
-    const hostFromUrl = urlParams.get("host") === "true";
+    const nameFromUrl = searchParams.get("name") || "";
+    const hostFromUrl = searchParams.get("host") === "true";
     
     setPlayerName(nameFromUrl);
     setIsHost(hostFromUrl);
 
-    if (typeof code !== "string") return; // ⭕ code가 확실한 '글자'일 때만 통과시키는 방어막!
-      const unsub = onSnapshot(doc(db, "rooms", code), (snap) => {
+    if (typeof code !== "string") return;
+    
+    const unsub = onSnapshot(doc(db, "rooms", code), (snap) => {
       if (snap.exists()) {
         const data = snap.data();
         setRoom(data);
         if (data.status === "playing" && data.gameType) {
-          window.location.href = `/game/${code}?type=${data.gameType}&name=${nameFromUrl}&host=${hostFromUrl}`;
+          router.push(`/game/${code}?type=${data.gameType}&name=${encodeURIComponent(nameFromUrl)}&host=${hostFromUrl}`);
         }
       }
     });
     return () => unsub();
-  }, [code]);
+  }, [code, searchParams, router]);
   
-  async function startGame(gameType) {
-  if (typeof code !== "string") return; // ⭕ 여기도 확실하게 글자 타입만 검사하도록 변경!
-  await updateDoc(doc(db, "rooms", code), {
+  async function startGame(gameType: string) {
+    if (typeof code !== "string") return;
+    await updateDoc(doc(db, "rooms", code), {
       status: "playing",
       gameType,
     });
-    window.location.href = `/game/${code}?type=${gameType}&name=${playerName}&host=true`;
+    router.push(`/game/${code}?type=${gameType}&name=${encodeURIComponent(playerName)}&host=true`);
   }
 
   if (!room) return (
@@ -57,7 +61,7 @@ export default function RoomPage() {
       background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
       display: "flex",
       alignItems: "center",
-      justify: "center",
+      justifyContent: "center", 
       fontFamily: "'Segoe UI', sans-serif",
       padding: "20px",
       color: "white",
@@ -85,7 +89,7 @@ export default function RoomPage() {
           <h3 style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "12px" }}>
             참가자 ({room.players?.length || 0}명)
           </h3>
-          {room.players?.map((p, i) => (
+          {room.players?.map((p: any, i: number) => (
             <div key={i} style={{
               display: "flex",
               alignItems: "center",
@@ -158,5 +162,20 @@ export default function RoomPage() {
         )}
       </div>
     </main>
+  );
+}
+
+// ==========================================
+// 2. Vercel(Next.js) 빌드 에러 방지용 최상단 배리어
+// ==========================================
+export default function RoomPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight:"100vh", background:"#1a1a2e", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:"18px" }}>
+        로딩 중...
+      </div>
+    }>
+      <RoomContent />
+    </Suspense>
   );
 }
