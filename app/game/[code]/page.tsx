@@ -226,7 +226,8 @@ function Blackjack({ gameState, playerName, players, isHost, code }) {
           return (
             <div key={p.name} style={{
               background: winner?.name === p.name ? "rgba(255,215,0,0.15)" : "rgba(255,255,255,0.05)",
-              border: `2px solid ${winner?.name === p.name ? "#ffd700" : "isBust" ? "#ff4444" : "rgba(255,255,255,0.1)"}`,
+              // ⭕ 따옴표를 지워서 진짜 변수로 만들어줍니다.
+              border: `2px solid ${winner?.name === p.name ? "#ffd700" : isBust ? "#ff4444" : "rgba(255,255,255,0.1)"}`,
               borderRadius: "16px", padding: "16px", textAlign: "center", minWidth: "130px",
             }}>
               <div style={{ fontWeight:"700", marginBottom:"8px" }}>{p.name}{isMe ? " (나)" : ""}</div>
