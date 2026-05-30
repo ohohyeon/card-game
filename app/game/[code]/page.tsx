@@ -388,7 +388,7 @@ function Poker({ gameState, playerName, players, isHost, code }: any) {
 // 5. 공통 UI 컴포넌트 및 유틸 스타일
 // ==========================================
 function CardUI({ card, small = false }: any) {
-  const size = small ? { width:"44px", height:"64px", fontSize:"13px" } : { width:"56px", height:"80px", fontSize:"16px"; };
+  const size = small ? { width:"44px", height:"64px", fontSize:"13px" } : { width:"56px", height:"80px", fontSize:"16px" }; // ⭕ 세미콜론 삭제!
   return (
     <div style={{ ...size, background:"white", borderRadius:"8px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", color:cardColor(card.suit), fontWeight:"800", boxShadow:"0 4px 12px rgba(0,0,0,0.3)" }}>
       <div>{card.value}</div>
