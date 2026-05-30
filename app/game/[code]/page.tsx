@@ -16,14 +16,14 @@ function createDeck() {
   return deck.sort(() => Math.random() - 0.5);
 }
 
-function cardValue(card) {
+function cardValue(targetCard) {
   const order = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"];
-  return order.indexOf(card.value);
+  return order.indexOf(targetCard.value);
 }
 
-function suitValue(card) {
+function suitValue(targetCard) {
   const order = ["♣","♥","♦","♠"];
-  return order.indexOf(card.suit);
+  return order.indexOf(targetCard.suit);
 }
 
 function cardColor(suit) {
@@ -106,11 +106,11 @@ export default function GamePage() {
 function HighCard({ gameState, playerName, players }) {
   const { hands } = gameState;
   const winner = players.reduce((best, p) => {
-    const card = hands[p.name]?.[0];
+    const playerCard = hands[p.name]?.[0];
     if (!best) return p;
     const bestCard = hands[best.name]?.[0];
-    if (cardValue(card) > cardValue(bestCard)) return p;
-    if (cardValue(card) === cardValue(bestCard) && suitValue(card) > suitValue(bestCard)) return p;
+    if (cardValue(playerCard) > cardValue(bestCard)) return p;
+    if (cardValue(playerCard) === cardValue(bestCard) && suitValue(playerCard) > suitValue(bestCard)) return p;
     return best;
   }, null);
 
@@ -118,7 +118,7 @@ function HighCard({ gameState, playerName, players }) {
     <GameLayout title="🎴 하이카드">
       <div style={{ display:"flex", flexWrap:"wrap", gap:"16px", justifyContent:"center", marginBottom:"32px" }}>
         {players.map(p => {
-          const card = hands[p.name]?.[0];
+          const playerCard = hands[p.name]?.[0];
           const isWinner = winner?.name === p.name;
           return (
             <div key={p.name} style={{
@@ -128,7 +128,7 @@ function HighCard({ gameState, playerName, players }) {
             }}>
               {isWinner && <div style={{ fontSize:"20px", marginBottom:"4px" }}>👑</div>}
               <div style={{ fontWeight:"700", marginBottom:"12px" }}>{p.name}{p.name === playerName ? " (나)" : ""}</div>
-              {card && <CardUI card={card} />}
+              {playerCard && <CardUI card={playerCard} />}
             </div>
           );
         })}
@@ -205,7 +205,7 @@ function Blackjack({ gameState, playerName, players, isHost, code }) {
       if (bust[p.name]) return best;
       if (!best || scores[p.name] > scores[best.name]) return p;
       return best;
-    }, null);
+    } , null);
   }
 
   return (
@@ -224,7 +224,7 @@ function Blackjack({ gameState, playerName, players, isHost, code }) {
           return (
             <div key={p.name} style={{
               background: winner?.name === p.name ? "rgba(255,215,0,0.15)" : "rgba(255,255,255,0.05)",
-              border: `2px solid ${winner?.name === p.name ? "#ffd700" : isBust ? "#ff4444" : "rgba(255,255,255,0.1)"}`,
+              border: `2px solid ${winner?.name === p.name ? "#ffd700" : "isBust" ? "#ff4444" : "rgba(255,255,255,0.1)"}`,
               borderRadius: "16px", padding: "16px", textAlign: "center", minWidth: "130px",
             }}>
               <div style={{ fontWeight:"700", marginBottom:"8px" }}>{p.name}{isMe ? " (나)" : ""}</div>
