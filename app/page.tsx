@@ -64,7 +64,7 @@ export default function Home() {
       background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
       display: "flex",
       alignItems: "center",
-      justify: "center",
+      justifyContent: "center", // ⭕ justifyContent 로 바르게 고쳐줍니다.
       fontFamily: "'Segoe UI', sans-serif",
       padding: "20px",
     }}>
