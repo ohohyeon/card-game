@@ -281,9 +281,10 @@ function Poker({ gameState, playerName, players, isHost, code }) {
     const suits = cards.map(c => c.suit);
     const valueCounts = {};
     values.forEach(v => valueCounts[v] = (valueCounts[v] || 0) + 1);
-    const counts = Object.values(valueCounts).sort((a,b) => b-a);
+    // ⭕ a와 b를 강제로 숫자(Number)로 인정하게 만듭니다.
+    const counts = Object.values(valueCounts).sort((a, b) => Number(b) - Number(a));
     const isFlush = suits.every(s => s === suits[0]);
-    const sorted = [...values].sort((a,b) => a-b);
+    const sorted = [...values].sort((a, b) => Number(a) - Number(b));
     const isStraight = sorted[4] - sorted[0] === 4 && new Set(sorted).size === 5;
     if (isFlush && isStraight) return 8;
     if (counts[0] === 4) return 7;
