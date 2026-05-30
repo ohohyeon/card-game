@@ -64,7 +64,7 @@ export default function Home() {
       background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
       display: "flex",
       alignItems: "center",
-      justifyContent: "center",
+      justify: "center",
       fontFamily: "'Segoe UI', sans-serif",
       padding: "20px",
     }}>
@@ -130,6 +130,7 @@ export default function Home() {
   );
 }
 
+// ⭕ 이 스타일 뭉치들이 확실하게 고정된 CSS 속성임을 Vercel에게 선언합니다.
 const inputStyle = {
   width: "100%",
   padding: "14px 16px",
@@ -140,19 +141,19 @@ const inputStyle = {
   fontSize: "15px",
   marginBottom: "12px",
   outline: "none",
-  boxSizing: "border-box",
+  boxSizing: "border-box" as const,
 };
 
 const primaryBtnStyle = {
   width: "100%",
   padding: "14px",
   background: "linear-gradient(135deg, #667eea, #764ba2)",
-  border: "none",
+  border: "none" as const,
   borderRadius: "12px",
   color: "white",
   fontSize: "16px",
-  fontWeight: "700",
-  cursor: "pointer",
+  fontWeight: "700" as const,
+  cursor: "pointer" as const,
   marginBottom: "8px",
 };
 
@@ -164,6 +165,6 @@ const secondaryBtnStyle = {
   borderRadius: "12px",
   color: "white",
   fontSize: "16px",
-  fontWeight: "700",
-  cursor: "pointer",
+  fontWeight: "700" as const,
+  cursor: "pointer" as const,
 };
